@@ -11,6 +11,7 @@ blue = (0,138, 255)
 black = (0,0,0)
 #height = randint(-200,350)
 
+
 def bird(bird_y):
     pygame.draw.rect(WIN, (200,100,100), (200, bird_y, 35,35))
 
@@ -29,28 +30,27 @@ def main():
     brick_y = 400
 
     bird_y = 200
-    n = 1
 
-    pygame.time.Clock().tick(10)
 
     while run:
-        #pygame.time.Clock().tick(60)
+        pygame.display.update()
+        WIN.fill(black)
+        pygame.time.Clock().tick(60)
         keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_UP] and bird_y > 10:
+                bird_y -= 8
+        if keys[pygame.K_DOWN] and bird_y < 760 :
+            bird_y += 8
 
         bricks(brick_x, brick_y)
         bird(bird_y)
         #brick_x -= 2
-        if bird_y < 760:
-            bird_y += 2 * (n)
-        #n += 0.05
-        pygame.display.update()
-        WIN.fill(black)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if keys[pygame.K_SPACE]:
-                bird_y -= 100
+            
+            
 
 
 main()
