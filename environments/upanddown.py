@@ -13,19 +13,18 @@ black = (0,0,0)
 
 
 def bird(bird_y):
-    pygame.draw.rect(WIN, (200,100,100), (200, bird_y, 35,35))
+    return pygame.draw.rect(WIN, (200,100,100), (200, bird_y, 35,35))
 
 
 def bricks(x_pos, y_pos):
     
-    #blocks = [pygame.draw.rect(WIN, blue, (x_pos + (i * 200), y_pos, 100, 100)) for i in range(10)]
-    pygame.draw.rect(WIN, blue, (x_pos,y_pos,100,100))
-    
+    blocks = [pygame.draw.rect(WIN, blue, (x_pos + (i * 200), y_pos, 100, 100)) for i in range(10)]    
 
 
 
 def main():
     run = True
+    gameon = False
     brick_x = 400
     brick_y = 400
 
@@ -33,22 +32,35 @@ def main():
 
 
     while run:
+        # Basic shit 
         pygame.display.update()
         WIN.fill(black)
         pygame.time.Clock().tick(60)
         keys = pygame.key.get_pressed()
 
+        # Movement functionality 
         if keys[pygame.K_UP] and bird_y > 10:
                 bird_y -= 8
         if keys[pygame.K_DOWN] and bird_y < 760 :
             bird_y += 8
 
+        #Start game functionality 
+        if keys[pygame.K_SPACE]:
+            gameon = True
+        
+        if gameon:
+            brick_x -= 2
+
         bricks(brick_x, brick_y)
         bird(bird_y)
-        #brick_x -= 2
         for event in pygame.event.get():
+            # Makes sure we can exit 
             if event.type == pygame.QUIT:
                 run = False
+            #Collision functionality 
+
+            #This will have to change, but same basic idea 
+            
             
             
 
