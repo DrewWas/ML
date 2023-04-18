@@ -9,6 +9,7 @@ pygame.display.flip()
 # CONSTANTS
 blue = (0,138, 255)
 black = (0,0,0)
+heights = [randint(0,500) for i in range(10)]
 
 
 
@@ -16,15 +17,13 @@ def bird(bird_y):
     return pygame.draw.rect(WIN, (200,100,100), (200, bird_y, 35,35))
 
 
-def get_heights(T_or_F):
-    if T_or_F:
-        return [randint(0,500) for _ in range(10)]
+
     
 
 
 def bricks(x_pos, y_pos):
 
-    y_pos = get_heights(True)
+    y_pos = heights
     
     upper_blocks = [pygame.draw.rect(WIN, blue, (x_pos + (i * 200), 0, 50, y_pos[i])) for i in range(10)]
     lower_blocks = [pygame.draw.rect(WIN, blue, (x_pos + (i * 200), (y_pos[i] + 150), 50, 800)) for i in range(10)]
