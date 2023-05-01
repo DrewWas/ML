@@ -18,16 +18,20 @@ def bird(bird_y):
 
 
 
-    
 
 
 def bricks(x_pos, y_pos):
 
     y_pos = heights
+    dist = (x_pos + (i * 200) for i in range(10))
     
     upper_blocks = [pygame.draw.rect(WIN, blue, (x_pos + (i * 200), 0, 50, y_pos[i])) for i in range(10)]
     lower_blocks = [pygame.draw.rect(WIN, blue, (x_pos + (i * 200), (y_pos[i] + 150), 50, 800)) for i in range(10)]
-    return None 
+
+    if x_pos < -1200:
+        pass
+    
+    return dist 
 
 
 
@@ -36,9 +40,8 @@ def main():
     gameon = False
     brick_x = 400
     brick_y = 400
-    reset = False
-
     bird_y = 200
+    score = 0
 
 
     while run:
@@ -48,7 +51,7 @@ def main():
         WIN.fill(black)
         keys = pygame.key.get_pressed()
 
-        # Movement functionality 
+        #Bird Movement functionality 
         if (keys[pygame.K_UP] or keys[pygame.K_w])and bird_y > 10:
                 bird_y -= 8
         if (keys[pygame.K_DOWN] or keys[pygame.K_s]) and bird_y < 760 :
@@ -61,8 +64,19 @@ def main():
         if gameon:
             brick_x -= 5
 
-      
+            
+              
+
+
         bricks(brick_x, brick_y)
+
+
+        #Score functionality
+        
+
+
+      
+        #bricks(brick_x, brick_y)
         bird(bird_y)
         for event in pygame.event.get():
             # Makes sure we can exit 
@@ -71,6 +85,7 @@ def main():
             #Collision functionality 
 
             #This will have to change, but same basic idea 
+            ## Pixel math (if in this xrange and yrange ____)
             
             
             
