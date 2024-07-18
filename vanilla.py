@@ -10,15 +10,20 @@ pygame.display.set_caption("Vanilla NN Visualization")
 # Colors
 BLACK = (0,0,0)
 BLUE = (12,31,255)
-RED = (255,31,21)
-GRAY = (123,123,123,)
+GRAY = (123,123,123)
+WHITE = (255,255,255)
+YELLOW = (255,255,2)
+GREEN = (12,255,24)
 
 # Coordinates 
-red_coords = []
-blue_coords= []
+yellow_coords = []
+blue_coords = []
 
 
-def draw_grid():
+def draw():
+    
+    font = pygame.font.SysFont("Arial", 25, bold=True)
+
     # Main grid lines
     for i in range(int(WIDTH / 35)):
         pygame.draw.line(SCREEN, GRAY, (i * 40, HEIGHT), (i * 40, 0), 1)
@@ -30,26 +35,79 @@ def draw_grid():
     pygame.draw.line(SCREEN, GRAY, (720, HEIGHT), (720, 0), 5)
     pygame.draw.line(SCREEN, GRAY, (0, 403), (WIDTH, 403), 5)
 
-def main():
+    # Draw buttons
+    pygame.draw.rect(SCREEN, WHITE, (1240, 10, 150, 110))
+    pygame.draw.rect(SCREEN, BLUE, (1245, 15, 140, 30))
+    pygame.draw.rect(SCREEN, YELLOW, (1245, 50, 140, 30))
+    pygame.draw.rect(SCREEN, GREEN, (1245, 85, 140, 30))
 
+    # Text
+    SCREEN.blit(font.render("Add Blue", False, BLACK), (1260,17)) 
+    SCREEN.blit(font.render("Add Yellow", False, BLACK), (1250,52)) 
+    SCREEN.blit(font.render("Start NN", False, BLACK), (1260,87)) 
+
+    # Points
+    for i in blue_coords:
+        pygame.draw.circle(SCREEN, BLUE, i, 8) 
+
+    for j in yellow_coords:
+        pygame.draw.circle(SCREEN, YELLOW, j, 8) 
+
+
+def main():
     run = True
     clock = pygame.time.Clock()
-
+    selected = False
+    selected_color = None
+    mouse_in_box = False
+    
+    button_areas = [
+        (1245, 15, 140, 30, BLUE),
+        (1245, 50, 140, 30, YELLOW),
+        (1245, 85, 140, 30, None)  # None color for deselect
+    ]
+    
     while run:
+        if selected:
+            pygame.draw.circle(SCREEN, selected_color, mouse_pos, 8) 
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_in_box = (1245 < mouse_pos[0] < 1385 and 15 < mouse_pos[1] < 115)
 
-        draw_grid()
+            if event.type == pygame.MOUSEBUTTONUP:
+                if mouse_in_box:
+                    for x, y, w, h, color in button_areas:
+                        if x < mouse_pos[0] < x + w and y < mouse_pos[1] < y + h:
+                            selected = color is not None
+                            selected_color = color
+                            break
+                elif selected:
+                    if selected_color == YELLOW and (mouse_pos not in yellow_coords):
+                        yellow_coords.append(mouse_pos)
+                    elif selected_color == BLUE and (mouse_pos not in blue_coords):
+                        blue_coords.append(mouse_pos)
+                    
+                    #pygame.draw.circle(SCREEN, selected_color, mouse_pos, 8) 
+
+
+        print("Num of blue points:  ", len(blue_coords))
+        print("Num of yellow points: ", len(yellow_coords))
+        
+        draw()
         pygame.display.update()
-
         clock.tick(FPS)
         SCREEN.fill(BLACK)
-
-
+    
     pygame.quit()
 
 
 if __name__ == "__main__":
     main()
+
+
+
+
