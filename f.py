@@ -21,7 +21,7 @@ yellow_coords = []
 blue_coords = []
 
 
-def draw():
+def draw(line_start=None, line_end=None):
     font = pygame.font.SysFont("Arial", 25, bold=True)
 
     # Main grid lines
@@ -52,6 +52,11 @@ def draw():
 
     for j in yellow_coords:
         pygame.draw.circle(SCREEN, YELLOW, (j[0], 1000 - j[1]), 8)
+
+    if line_start and line_end:
+        #pygame.draw.line(SCREEN, GREEN, line_start, line_end, 2)
+        pygame.draw.line(SCREEN, GREEN, (0,1000), (1000,1000), 2)
+
 
 # --------------------------------------------------------------------------
 
@@ -129,40 +134,50 @@ def train_weights(matrix, weights, epochs=100, learning_rate=2.0):
 # --------------------------------------------------------------------------
 
 def perceptron():
-# 1 represents blue
+    # 1 represents blue
     # 0 represents yellow
 
     data = matrix_ify()
 
-    weights = [0.5, 0.3, 0.9]
+    weights = [0.5, 0.3, 0.9]  # initially random values
 
     new_weights = train_weights(data, weights)  
 
     print("\nNew Weights: ", new_weights)
 
-    m = new_weights[1] / new_weights[2]
+    """
+    m = new_weights[1] / new_weights[2] 
+    b = -new_weights[0] / new_weights[2] 
+
+    start_point = (0, HEIGHT - int(b / 1000)) 
+    end_point = (WIDTH / 1000, HEIGHT - int(((m * WIDTH) + b) / 1000)) 
+    
+    print("Start and end points: ", start_point, end_point) 
+    return start_point , end_point  
+    """
+    m = -new_weights[1] / new_weights[2]
     b = -new_weights[0] / new_weights[2]
 
-    start_point = (0, int(b))
-    end_point = (WIDTH, int((m * WIDTH) + b))
+    # Start and end points for the decision boundary line
+    x_start = 0
+    y_start = HEIGHT - int(b / HEIGHT)
 
-    return start_point, end_point
+    x_end = WIDTH
+    y_end = HEIGHT - int((m * WIDTH + b) / HEIGHT)
+
+    print("Start and end points: ", (x_start, y_start), (x_end, y_end))
+    return (x_start, y_start), (x_end, y_end)
 
 
 # --------------------------------------------------------------------------
 
-def draw_boundary(start, end):
-    pygame.draw.line(SCREEN, GREEN, start, end, 2)
-    
-
-# --------------------------------------------------------------------------
 
 def main():
     run = True
     clock = pygame.time.Clock()
     selected = False
     selected_color = None
-    start, end = (0,0), (0,0)
+    line_start, line_end = None, None 
 
     button_areas = [
         (845, 15, 140, 30, BLUE),
@@ -172,8 +187,7 @@ def main():
 
     while run:
         SCREEN.fill(BLACK)
-        draw()
-        draw_boundary(start, end)
+        draw(line_start, line_end)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -192,7 +206,7 @@ def main():
 
                     if selected_color == GREEN:
                         print("START THE PERCEPTRON")
-                        start, end = perceptron()
+                        line_start, line_end= perceptron()
 
                 elif selected:
                     if selected_color == YELLOW and (mouse_pos not in yellow_coords):
@@ -207,7 +221,6 @@ def main():
         clock.tick(FPS)
 
     pygame.quit()
-
 
 
 
