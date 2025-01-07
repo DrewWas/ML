@@ -1,5 +1,4 @@
 import pygame
-import math
 
 # Constants
 WIDTH, HEIGHT = 1000, 1000
@@ -8,14 +7,15 @@ GRAY = (100, 100, 100)
 BLUE = (0, 138, 255)
 RED = (255, 34, 86)
 BLACK = (0, 0, 0)
+GREEN = (12, 255, 35)
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT), display=1)
 pygame.init()
 pygame.font.init()
 FONT = pygame.font.SysFont('futura', 30)
 FONT_SMALL = pygame.font.SysFont('futura', 18)
 
-RED_DATA = []
-BLUE_DATA = []
+data_matrix = []
+weight_vector = [0, 0, 0]
 
 def main():
     run = True
@@ -43,27 +43,29 @@ def main():
 
                 if real_pos[0] > 20 and real_pos[0] < 190 and real_pos[1] > 95 and real_pos[1] < 130:   
                     data_type_selected = BLACK 
+                    train_weights()
 
                 elif data_type_selected == RED and (real_pos[0] > 200 or real_pos[1] > 140):
-                    RED_DATA.append((x_pos, y_pos))
-                    print("RED DATA: ", RED_DATA)
+                    # RED = 0 for data purposes
+                    data_matrix.append([1, x_pos, y_pos, 0])
 
                 elif data_type_selected == BLUE and (real_pos[0] > 200 or real_pos[1] > 140):
-                    BLUE_DATA.append((x_pos, y_pos))
-                    print("BLUE DATA: ", BLUE_DATA)
+                    # BLUE =  1 for data purposes
+                    data_matrix.append([1, x_pos, y_pos, 1])
 
 
+
+            draw_grid_lines()
 
             # Unfortunately we have to redraw because otherwise the mouse would just paint over the entire screen
-            for point in RED_DATA:
-                pygame.draw.circle(WINDOW, RED, (point[0] + (WIDTH // 2), -point[1] + (HEIGHT // 2)), 10) 
-
-            for point in BLUE_DATA:
-                pygame.draw.circle(WINDOW, BLUE, (point[0] + (WIDTH // 2), -point[1] + (HEIGHT // 2)), 10) 
+            for point in data_matrix:
+                if point[3] == 0:
+                    pygame.draw.circle(WINDOW, RED, (point[1] + (WIDTH // 2), -point[2] + (HEIGHT // 2)), 10) 
+                elif point[3] == 1:
+                    pygame.draw.circle(WINDOW, BLUE, (point[1] + (WIDTH // 2), -point[2] + (HEIGHT // 2)), 10) 
 
 
             pygame.draw.circle(WINDOW, data_type_selected, (x_pos + (WIDTH // 2), -y_pos + (HEIGHT // 2)), 10) 
-            draw_grid_lines()
             draw_color_select(x_pos, y_pos)
             pygame.display.update()            
     
@@ -91,8 +93,8 @@ def draw_color_select(x_pos, y_pos):
     pygame.draw.rect(WINDOW, RED, pygame.Rect(20, 55, 170, 33))
     WINDOW.blit(FONT.render("Red Data", False, BLACK), (45, 50))
 
-    pygame.draw.rect(WINDOW, BLACK, pygame.Rect(20, 95, 170, 33), 3)
-    WINDOW.blit(FONT.render("RESET", False, BLACK), (60, 92))
+    pygame.draw.rect(WINDOW, GREEN, pygame.Rect(20, 95, 170, 33), 3)
+    WINDOW.blit(FONT.render("START", False, BLACK), (60, 92))
 
 
     # COORDINATE DISPLAY
@@ -100,22 +102,70 @@ def draw_color_select(x_pos, y_pos):
     WINDOW.blit(FONT_SMALL.render("X: " + str(x_pos) + "    Y: " + str(y_pos), False, BLACK), (853, 15))
 
 
+
+def train_weights():
+    learning_rate = 1
+    epochs = 10
+
+    for epoch in range(epochs):
+        curr_acc = accuracy()
+
+        print("\nEpoch: ", epoch, "\nWeights: ", weight_vector)
+        print("\nAccuracy: ", curr_acc)
+
+        # Also here add redrawing the line? pygame.display.line(...)
+
+        if curr_acc == 1:
+            break
+
+
+        for i in data_matrix:
+            prediction = perceptron(i[:-1], weight_vector) 
+            error = i[-1] - prediction
+
+
+            for j in range(len(weight_vector)):
+                weight_vector[j] += learning_rate * error * i[j] 
+               
+
+
+
+def perceptron(inputs, weights):
+    threshold = 0
+    current_activation = 0
+
+    for i, w in zip(inputs, weights):
+        current_activation += i * w
+
+    if current_activation >= threshold:
+        return 1
+    else:
+        return 0
+
+
+def accuracy():
+    num_correct = 0
+
+    for i in data_matrix:
+        prediction = perceptron(i[:-1], weight_vector)
+        if prediction == i[-1]:
+            num_correct += 1
+
+    return num_correct / float(len(data_matrix))
+
+
+
+
+# HASHTAG NO OOP LOL
 main()
 
 
 """
 TO DO:
-* GET MOUSE INPUT
-
-* SELECT/CHANGE COLORS
-
-* ADD COLORS TO GRID
-
-* ADD COLORS TO DATA POINTS
-
 * RUN ACTUAL ALGORITHM
-
-* 
 """
+
+
+
 
 
