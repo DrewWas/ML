@@ -15,11 +15,12 @@ FONT = pygame.font.SysFont('futura', 30)
 FONT_SMALL = pygame.font.SysFont('futura', 18)
 
 data_matrix = []
-weight_vector = [0, 0, 0]
+weight_vector = [0.5, 0.5, 0.5]
 
 def main():
     run = True
     data_type_selected = BLACK 
+    boundaries = [(0, 0), (0, 0)]
 
     while run:
         for event in pygame.event.get():
@@ -43,7 +44,7 @@ def main():
 
                 if real_pos[0] > 20 and real_pos[0] < 190 and real_pos[1] > 95 and real_pos[1] < 130:   
                     data_type_selected = BLACK 
-                    train_weights()
+                    boundaries = train_weights()
 
                 elif data_type_selected == RED and (real_pos[0] > 200 or real_pos[1] > 140):
                     # RED = 0 for data purposes
@@ -65,6 +66,7 @@ def main():
                     pygame.draw.circle(WINDOW, BLUE, (point[1] + (WIDTH // 2), -point[2] + (HEIGHT // 2)), 10) 
 
 
+            pygame.draw.line(WINDOW, GREEN, boundaries[0], boundaries[1], 5) 
             pygame.draw.circle(WINDOW, data_type_selected, (x_pos + (WIDTH // 2), -y_pos + (HEIGHT // 2)), 10) 
             draw_color_select(x_pos, y_pos)
             pygame.display.update()            
@@ -104,8 +106,9 @@ def draw_color_select(x_pos, y_pos):
 
 
 def train_weights():
-    learning_rate = 1
-    epochs = 10
+    learning_rate = 0.2
+    epochs = 100
+    w0, w1, w2 = weight_vector
 
     for epoch in range(epochs):
         curr_acc = accuracy()
@@ -126,7 +129,11 @@ def train_weights():
 
             for j in range(len(weight_vector)):
                 weight_vector[j] += learning_rate * error * i[j] 
-               
+              
+
+    #return (0, (((500 * w1) + w0) / w2) + 500), (1000, (((1500 * w1) + w0) / w2) + 500)
+    #return (-1000, -(((-1000 * w1) + w0) / w2) + 500), (1000, -(((1000 * w1) + w0) / w2) + 500)
+    return (-1000, (((-1000 * w1) + w0) / w2) + 1000), (1000, (((1000 * w1) + w0) / w2) + 500)
 
 
 
@@ -159,11 +166,6 @@ def accuracy():
 # HASHTAG NO OOP LOL
 main()
 
-
-"""
-TO DO:
-* RUN ACTUAL ALGORITHM
-"""
 
 
 
